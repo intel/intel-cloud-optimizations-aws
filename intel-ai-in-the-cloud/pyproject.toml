@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "intel-ai-in-the-cloud"
+version = "0.1.0"
+description = ""
+authors = ["rahul.unnikrishnan.nair@intel.com <rahul.unnikrishnan.nair@intel.com>"]
+readme = "README.md"
+packages = [{include = "intel_ai_in_the_cloud"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

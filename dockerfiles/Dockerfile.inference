@@ -1,0 +1,14 @@
+ARG version=2021.7.1-debian-11-r6
+FROM bitnami/scikit-learn-intel:$version
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+WORKDIR /workspace
+COPY ../intel-ai-in-the-cloud/ intel-ai-in-the-cloud
+
+# install project
+RUN pip install intel-ai-in-the-cloud
+
+# run inference
+#ENTRYPOINT ["python", "main.py", "--inference"]
+
