@@ -1,8 +1,8 @@
 <h1>Intel&reg; AI in the Cloud</h1>
 
-# Intel® Extension for Scikit-learn Cloud Deployment docs
+## Intel® Extension for Scikit-learn Cloud Deployment docs
 
-# All notes are placeholders
+## All notes are placeholders
 
 ## Cheat sheet
 
