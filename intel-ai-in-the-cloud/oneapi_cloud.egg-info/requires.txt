@@ -1,0 +1,2 @@
+scikit-learn-intelex>=2021.6.3
+joblib>=1.2.0

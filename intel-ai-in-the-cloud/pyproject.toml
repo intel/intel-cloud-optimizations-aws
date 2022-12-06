@@ -1,15 +1,15 @@
-[tool.poetry]
-name = "intel-ai-in-the-cloud"
+[tool.pdm]
+
+[project]
+name = "oneapi-cloud"
 version = "0.1.0"
 description = ""
-authors = ["rahul.unnikrishnan.nair@intel.com <rahul.unnikrishnan.nair@intel.com>"]
-readme = "README.md"
-packages = [{include = "intel_ai_in_the_cloud"}]
-
-[tool.poetry.dependencies]
-python = "^3.9"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+authors = [
+    {name = "Rahul Unnikrishnan Nair", email = "rahul.unnikrishnan.nair@intel.com"},
+]
+dependencies = [
+    "scikit-learn-intelex>=2021.6.3",
+    "joblib>=1.2.0",
+]
+requires-python = ">=3.9"
+license = {text = "MIT"}
