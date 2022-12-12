@@ -1,32 +1,32 @@
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import boto3
-from joblib import dump, load
+import joblib
 
 
 class Store:
-    def __init__(self, model=None, model_store="disk", bucket=None, path=None):
-        self.model = model
-        self.store_store = model_store
+    def __init__(self, backend="disk", bucket=None, model_name=None, path=None):
+        self.model = None
+        self.backend = backend
         self.path = path
         self.bucket = bucket
-        self.model_name = "model.joblib"
+        self.model_name = model_name
         self.path = self.path / self.model_name
 
     def _to_disk(self):
-        dump(self.model, self.path)
+        joblib.dump(self.model, self.path)
 
     def _from_disk(self):
-        return load(self.path)
+        return joblib.load(self.path)
 
     def _to_cloud(self):
-        if self.model_store == "s3":
+        if self.backend == "s3":
             self._to_s3()
 
     def _from_cloud(self):
-        if self.model_store == "s3":
+        if self.backend == "s3":
             return self._from_s3(self.bucket, self.model_name)
 
     def _to_s3(self):
@@ -44,19 +44,20 @@ class Store:
 
     def get(self):
         """get model from disk or cloud."""
-        if self.model_store == "disk":
+        if self.backend == "disk":
             return self._from_disk()
-        elif self.model_store == "s3":
+        elif self.backend == "s3":
             return self._from_cloud()
         else:
             print("storage backend not supported")  # TODO change to logging
             sys.exit(1)
 
-    def put(self):
+    def put(self, model):
         """put model to disk or cloud."""
-        if self.model_store == "disk":
+        self.model = model
+        if self.backend == "disk":
             self._to_disk()
-        elif self.model_store == "s3":
+        elif self.backend == "s3":
             self._to_cloud()
         else:
             print("storage backend not supported")  # TODO change to logging

@@ -68,6 +68,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "isort"
+version = "5.10.1"
+requires_python = ">=3.6.1,<4.0"
+summary = "A Python utility / library to sort Python imports."
+
+[[package]]
 name = "jmespath"
 version = "1.0.1"
 requires_python = ">=3.7"
@@ -188,7 +194,7 @@ summary = "HTTP library with thread-safe connection pooling, file post, and more
 
 [metadata]
 lock_version = "4.1"
-content_hash = "sha256:693b92150223161be71f61a5b6d0dd30221a397421a851040f0f2e132d432190"
+content_hash = "sha256:190cf21594bb50ac81035720788c038f71f4d2d90f3e5da4b47d51884628b663"
 
 [metadata.files]
 "black 22.10.0" = [
@@ -248,6 +254,10 @@ content_hash = "sha256:693b92150223161be71f61a5b6d0dd30221a397421a851040f0f2e132
     {url = "https://files.pythonhosted.org/packages/ba/c9/9ed0d70746cd6c615ce59d2bdb7683d31d5cde5b722b0118c8de768cf9f8/daal4py-2021.6.3-py38-none-win_amd64.whl", hash = "sha256:65625c1d61af30263e38aeb3c879536105d67989a9f7d4d3b957d5b79023bcc6"},
     {url = "https://files.pythonhosted.org/packages/de/4e/4d9a3e235e42beac9ed60511263addff516e9296471addece1f1f95fdcd4/daal4py-2021.6.3-py310-none-manylinux1_x86_64.whl", hash = "sha256:91548b49ad9bef13379b7fc4b02ac37a243d416973ea847637fee8cb3a08a5ac"},
     {url = "https://files.pythonhosted.org/packages/e5/da/6e78510c4810f9357f7db6691991f6b0a6c4f986fd2cf99905d70087b961/daal4py-2021.6.3-py39-none-macosx_10_15_x86_64.macosx_11_0_x86_64.whl", hash = "sha256:9d6b8ea44634f5de2d0d477526d3819b452b34597da0e07a7343177aa917935b"},
+]
+"isort 5.10.1" = [
+    {url = "https://files.pythonhosted.org/packages/ab/e9/964cb0b2eedd80c92f5172f1f8ae0443781a9d461c1372a3ce5762489593/isort-5.10.1.tar.gz", hash = "sha256:e8443a5e7a020e9d7f97f1d7d9cd17c88bcb3bc7e218bf9cf5095fe550be2951"},
+    {url = "https://files.pythonhosted.org/packages/b8/5b/f18e227df38b94b4ee30d2502fd531bebac23946a2497e5595067a561274/isort-5.10.1-py3-none-any.whl", hash = "sha256:6f62d78e2f89b4500b080fe3a81690850cd254227f27f75c3a0c491a1f351ba7"},
 ]
 "jmespath 1.0.1" = [
     {url = "https://files.pythonhosted.org/packages/00/2a/e867e8531cf3e36b41201936b7fa7ba7b5702dbef42922193f05c8976cd6/jmespath-1.0.1.tar.gz", hash = "sha256:90261b206d6defd58fdd5e85f478bf633a2901798906be2ad389150c5c60edbe"},

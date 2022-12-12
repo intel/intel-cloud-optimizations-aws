@@ -1,37 +1,37 @@
+"""entrypoint"""
+import argparse
 import os
-from pathlib import Path
+import sys
 
-from sklearnex import patch_sklearn
-
-patch_sklearn()
-from sklearn.svm import SVC
-from sklearn.datasets import load_iris
-
-from utils import Store
+from model import Model
+from server import serve
 
 
-class Model:
-    def __init__(self, model_store="disk"):
-        self.model = SVC()
-        self.path = os.path.join(Path(__file__).parent.resolve(), "model.joblib")
-        self.store = Store(model_store=model_store, path=self.path)
+def cli():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("backend", type=str, default="disk", choices=["disk", "s3"])
+    parser.add_argument("kind", type=str, default="infer", choices=["train", "infer"])
+    args = parser.parse_args()
+    if args.backend == "s3":
+        try:
+            os.environ.get("MODEL_BUCKET_NAME")
+        except KeyError:
+            sys.exit("bucket name for s3 should be specified as ane env variable.")
+    return args
 
-    @classmethod
-    def dataset():
-        """get iris dataset."""
-        return load_iris(return_X_y=True)
 
-    def train(self):
-        """a simple svm classifier."""
-        X, y = self.dataset()
-        self.model.fit(X, y)
-        return self.model
+def main():
+    args = cli()
+    bucket = None
+    if args.backend == "s3":
+        bucket = os.environ.get("MODEL_BUCKET_NAME")
+    clf = Model(bucket=bucket)
+    if args.kind == "train":
+        clf.train()
+        clf.save()
+    elif args.kind == "infer":
+        serve()
 
-    def infer(self):
-        model = self.store.get(self.path)
-        X, _ = self.dataset()
-        return model.predict(X[0:235])
 
-    def save(self):
-        """pickle model."""
-        self.store.put()
+if __name__ == "__main__":
+    main()
