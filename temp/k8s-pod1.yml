@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: IOM
+  labels:
+    app: iom-k8s-scikit
+spec:
+  selector:
+    matchLabels:
+        app: iom-k8s-scikit
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: iom-k8s-scikit
+    spec:
+      containers:
+        - name: iom-k8s-scikit
+          image:
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          imagePullPolicy: Always
