@@ -12,6 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Install
+      uses: 
+      with:
+          version: latest
     - name: Checkout
       uses: actions/checkout@v2
 
