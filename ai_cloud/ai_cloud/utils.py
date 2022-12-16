@@ -5,15 +5,16 @@ from pathlib import Path
 import boto3
 import joblib
 
-
 class Store:
-    def __init__(self, backend="disk", bucket=None, model_name=None, path=None):
+    def __init__(self, backend="disk", bucket=None, key=None, model_name=None, path=None):
         self.model = None
         self.backend = backend
-        self.path = path
+        self.path = path # local path to folder containing model
         self.bucket = bucket
         self.model_name = model_name
-        self.path = self.path / self.model_name
+        self.path = self.path / self.model_name #full local path to model file
+        self.key = key #the folder on the s3 bucket. eg. the 's3folder' portion of s3://mybucket/s3folder
+        self.key = key / self.model_name #the path after the s3 bucket. eg., s3://mybucket/s3pathtofile
 
     def _to_disk(self):
         joblib.dump(self.model, self.path)
@@ -30,16 +31,24 @@ class Store:
             return self._from_s3(self.bucket, self.model_name)
 
     def _to_s3(self):
-        """upload model binary to s3."""
+        """
+        Upload model binary to s3
+            
+        Example AWS S3 URI:
+            s3://bucket/s3pathtofile
+        
+        """
         s3 = boto3.client("s3")
         with open(self.path, "rb") as fh:
-            s3.upload_fileobj(fh, self.bucket, self.model)
+            s3.upload_fileobj(fh, self.bucket, self.key)
 
     def _from_s3(self):
-        """upload model binary to s3."""
+        """download model binary to s3 to local disk"""
         s3 = boto3.client("s3")
+        local_folder_path = os.path.dirname(self.path)
+        Path(local_folder_path).mkdir(parents=True, exist_ok=True) #need to create folder before downloading file
         with open(self.path, "wb") as fh:
-            s3.download_fileobj(self.bucket, self.model_name, fh)
+            s3.download_fileobj(self.bucket, self.key, fh)
         return open(self.path, "rb")
 
     def get(self):
