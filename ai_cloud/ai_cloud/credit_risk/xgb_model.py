@@ -167,11 +167,9 @@ class Model(AbstractModel):
         # create a hold-out set
         log.info("Creating training and test sets")
         train, test = train_test_split(self.data, test_size=0.25, random_state=0)
-
         num_imputer = Pipeline(steps=[("imputer", SimpleImputer(strategy="median"))])
         pow_transformer = PowerTransformer()
         cat_transformer = OneHotEncoder(handle_unknown="ignore")
-
         preprocessor = ColumnTransformer(
             transformers=[
                 (
@@ -207,15 +205,15 @@ class Model(AbstractModel):
         X_train = train.drop(["loan_status", "bias_variable"], axis=1)
         y_train = train["loan_status"]
         X_train_out = preprocess.fit_transform(X_train)
+        print(f"preprocess named steps: {preprocess.named_steps['preprocessor']}, {type(preprocess.named_steps['preprocessor'])}")
         fnames = get_feature_names(preprocess.named_steps["preprocessor"])
         # create training matrix for xgboost
-        self.dtrain = xgb.DMatrix(X_train_out, y_train.values, feature_names=fnames)
-
+        self.dtrain = xgb.DMatrix(X_train_out, y_train.values)#, feature_names=X_train.columns)
         self.bias_indicator = test["bias_variable"].values.astype(int)
         X_test = test.drop(["loan_status", "bias_variable"], axis=1)
         self.y_test = test["loan_status"]
         self.X_test_out = preprocess.transform(X_test)
-        self.X_test_out = pd.DataFrame(self.X_test_out, columns=fnames)
+        self.X_test_out = pd.DataFrame(self.X_test_out)#, columns=fnames)
 
     def train(self):
 
