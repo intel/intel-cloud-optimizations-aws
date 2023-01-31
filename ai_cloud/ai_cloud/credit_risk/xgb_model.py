@@ -29,10 +29,17 @@ np.random.seed(42)
 
 class Model(AbstractModel):
     def __init__(
-        self, backend="disk", bucket=None, path=Path(__file__).parent.resolve()
+        self, backend="disk", bucket=None, path=None
     ):
-
-        self.data = pd.read_csv(path / "data" / "data.csv")
+        if path is not None:
+            path = Path(path).parent.resolve()
+        else:
+            raise FileNotFoundError
+        print(f"path here is :: {path}")
+        d_path = path / "data" / "data.csv"
+        print(f"path here is :: {d_path}")
+        self.data = pd.read_csv(d_path)
+        print(f"updated path is here is :: {d_path}")
         self.path = path / "models"
         self.store = store(
             backend=backend, bucket=bucket, path=self.path, model_name="model.joblib"
@@ -197,12 +204,13 @@ class Model(AbstractModel):
 
         # separate pipeline to allow for benchmarking
         preprocess = Pipeline(steps=[("preprocessor", preprocessor)])
-
         X_train = train.drop(["loan_status", "bias_variable"], axis=1)
         y_train = train["loan_status"]
         X_train_out = preprocess.fit_transform(X_train)
         fnames = get_feature_names(preprocess.named_steps["preprocessor"])
-
+        print(f"len feature names: {len(fnames)}")
+        print(f"len columns: {X_train_out.shape}")
+        import sys; sys.exit(1)
         # create training matrix for xgboost
         self.dtrain = xgb.DMatrix(X_train_out, y_train.values, feature_names=fnames)
 

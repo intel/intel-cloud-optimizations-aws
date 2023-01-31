@@ -28,7 +28,10 @@ async def train(data:TrainData):
     Returns:
         dict: A dictionary containing a success message and the validation scores.
     """
-    clf = Model("disk", path=data.path)
+    try:
+        clf = Model("disk", path=data.path)
+    except FileNotFoundError:
+        return {"msg": f"Data not found on the provided path {data.path}"}
     clf.generate_data(data.num_samples)
     clf.preprocess_data()
     log.info("Training model")
