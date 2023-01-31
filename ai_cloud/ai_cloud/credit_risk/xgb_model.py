@@ -208,9 +208,6 @@ class Model(AbstractModel):
         y_train = train["loan_status"]
         X_train_out = preprocess.fit_transform(X_train)
         fnames = get_feature_names(preprocess.named_steps["preprocessor"])
-        print(f"len feature names: {len(fnames)}")
-        print(f"len columns: {X_train_out.shape}")
-        import sys; sys.exit(1)
         # create training matrix for xgboost
         self.dtrain = xgb.DMatrix(X_train_out, y_train.values, feature_names=fnames)
 
