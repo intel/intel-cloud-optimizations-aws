@@ -49,7 +49,6 @@ def get_predictive_metrics(tp: int, fp: int, fn: int, tn: int) -> Dict[str, floa
         "fpr": fpr
     }
 
-
 def get_fairness_parity_report(
         model: xgb.core.Booster,
         X: pd.DataFrame,
@@ -101,3 +100,5 @@ def get_fairness_parity_report(
         "tnr": pred_p["tnr"]/pred_np["tnr"],
         "fpr": pred_p["fpr"]/pred_np["fpr"]
     }
+
+__all__ = ["get_fairness_parity_report"]

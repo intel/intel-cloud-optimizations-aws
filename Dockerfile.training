@@ -7,7 +7,7 @@ WORKDIR /workspace
 COPY oneapi_cloud oneapi_cloud
 
 # install project deps
-RUN pip3 install flask boto3 joblib
+RUN pip3 -r ./ai_cloud/requirements.txt
 
 # run inference
 ENTRYPOINT ["python", "/workspace/oneapi_cloud/oneapi_cloud/main.py", "disk", "train"]

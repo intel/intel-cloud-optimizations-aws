@@ -60,7 +60,9 @@ class DiskStore:
             return joblib.load(fh.name)
 
 
-def store(backend: str, model_name: str, path: str = None, bucket: str = None, key: str = None):
+def store(
+    backend: str, model_name: str, path: str = None, bucket: str = None, key: str = None
+):
     """
     Selector function for storing and retrieving models.
 
@@ -82,3 +84,6 @@ def store(backend: str, model_name: str, path: str = None, bucket: str = None, k
         return DiskStore(model_name, path)
     else:
         raise ValueError("invalid backend")
+
+
+__all__ = ["store"]
