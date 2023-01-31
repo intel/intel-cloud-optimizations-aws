@@ -1,14 +1,10 @@
 ARG version=2021.7.1-debian-11-r6
-FROM bitnami/scikit-learn-intel:$version
-
 ARG DEBIAN_FRONTEND=noninteractive
 
-WORKDIR /workspace
+FROM bitnami/scikit-learn-intel:$version
+
 COPY ai_cloud ai_cloud
-
-# install project deps
-RUN pip3 install -r ./ai_cloud/requirements.txt
-
-# run inference
+RUN pip3 install --user -r ai_cloud/requirements.txt
+ENV PATH=.local/bin:$PATH
 ENTRYPOINT ["python", "ai_cloud/ai_cloud/server.py"]
 
