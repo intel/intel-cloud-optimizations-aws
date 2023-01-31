@@ -34,7 +34,32 @@ from sklearn.cluster import KMeans
 
 ## Training docs
 
-//#TODO
+To test the service.
+
+Setup up the server:
+
+```python
+└❯ cd ./ai_cloud
+└❯ python ai_cloud/server.py 
+python ai_cloud/server.py
+```
+
+This will start the server:
+
+```bash
+Intel(R) Extension for Scikit-learn* enabled (https://github.com/intel/scikit-learn-intelex)
+INFO:     Started server process [145183]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+```
+
+To start the training please do:
+curl -X POST \
+  http:localhost:8000/train \
+  -H 'Content-Type: application/json' \
+  -d '{"path":"<path_to_data>", "num_samples": <number_of_samples>}'
+
 
 ## Inference deployment docs
 
