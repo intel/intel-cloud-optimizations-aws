@@ -51,31 +51,25 @@ class Model(AbstractModel):
         Function to synthetically generate 4M (default) rows
         from loan default data.
         """
-
         # synthesizing bias variable
         bias_prob = 0.65
         default = self.data["loan_status"] == 1
-
         default_bias = np.random.choice(
             [0, 1], p=[bias_prob, 1 - bias_prob], size=len(default)
         )
         non_default_bias = np.random.choice(
             [0, 1], p=[1 - bias_prob, bias_prob], size=len(default)
         )
-
         # bias conditional on label
         self.data["bias_variable"] = np.where(default, default_bias, non_default_bias)
-
         # number of rows to generate
         if size < self.data.shape[0]:
             pass
         else:
             log.info(f"Generating {size:,} rows of data")
-
             repeats = size // len(self.data)
             self.data = self.data.loc[np.repeat(self.data.index.values, repeats + 1)]
             self.data = self.data.iloc[:size]
-
             # perturbing all int/float columns
             person_age = self.data["person_age"].values + np.random.randint(
                 -1, 1, size=len(self.data)
@@ -98,7 +92,6 @@ class Model(AbstractModel):
             cb_person_cred_hist_length = self.data[
                 "cb_person_cred_hist_length"
             ].values + np.random.randint(0, 2, size=len(self.data))
-
             # perturbing all binary columns
             perturb_idx = np.random.rand(len(self.data)) > 0.1
             random_values = np.random.choice(
@@ -107,19 +100,16 @@ class Model(AbstractModel):
             person_home_ownership = np.where(
                 perturb_idx, self.data["person_home_ownership"], random_values
             )
-
             perturb_idx = np.random.rand(len(self.data)) > 0.1
             random_values = np.random.choice(
                 self.data["loan_intent"].unique(), len(self.data)
             )
             loan_intent = np.where(perturb_idx, self.data["loan_intent"], random_values)
-
             perturb_idx = np.random.rand(len(self.data)) > 0.1
             random_values = np.random.choice(
                 self.data["loan_grade"].unique(), len(self.data)
             )
             loan_grade = np.where(perturb_idx, self.data["loan_grade"], random_values)
-
             perturb_idx = np.random.rand(len(self.data)) > 0.1
             random_values = np.random.choice(
                 self.data["cb_person_default_on_file"].unique(), len(self.data)
@@ -127,7 +117,6 @@ class Model(AbstractModel):
             cb_person_default_on_file = np.where(
                 perturb_idx, self.data["cb_person_default_on_file"], random_values
             )
-
             self.data = pd.DataFrame(
                 list(
                     zip(
@@ -206,14 +195,13 @@ class Model(AbstractModel):
         y_train = train["loan_status"]
         X_train_out = preprocess.fit_transform(X_train)
         print(f"preprocess named steps: {preprocess.named_steps['preprocessor']}, {type(preprocess.named_steps['preprocessor'])}")
-        fnames = get_feature_names(preprocess.named_steps["preprocessor"])
         # create training matrix for xgboost
-        self.dtrain = xgb.DMatrix(X_train_out, y_train.values)#, feature_names=X_train.columns)
+        self.dtrain = xgb.DMatrix(X_train_out, y_train.values)
         self.bias_indicator = test["bias_variable"].values.astype(int)
         X_test = test.drop(["loan_status", "bias_variable"], axis=1)
         self.y_test = test["loan_status"]
         self.X_test_out = preprocess.transform(X_test)
-        self.X_test_out = pd.DataFrame(self.X_test_out)#, columns=fnames)
+        self.X_test_out = pd.DataFrame(self.X_test_out)
 
     def train(self):
 
