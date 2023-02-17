@@ -72,3 +72,10 @@ curl -X POST \
 //#TODO
 
 # Security
+
+
+
+
+class TrainData(BaseModel):
+    path: Path = Path.cwd()
+    num_samples: int = 400_00_00
