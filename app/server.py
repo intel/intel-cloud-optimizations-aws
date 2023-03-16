@@ -1,6 +1,5 @@
 import uvicorn
 import pandas as pd
-import json
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -9,6 +8,7 @@ from utils.logger import log
 from loan_default.model import Model
 from loan_default.predict import pred
 from loan_default.data import process_data, synthetic_datagen
+
 
 
 app = FastAPI()
@@ -30,7 +30,7 @@ class TrainPayload(BaseModel):
     data_key: str=None
     backend: str="s3"
 class PredictionPayload(BaseModel):
-    sample: str
+    sample: list
     model_name: str
     preprocessor_path: str=None
     local_model_path: str=None
@@ -75,7 +75,7 @@ async def train(payload:PreprocessingPayload):
 @app.post("/train")
 async def train(payload:TrainPayload):
     """Train the model.
-    This endpoint trains the model using the provided path for the data and number of samples to generate.
+    This endpoint trains the model using the provided path for the data.
 
     Parameters
     ----------
@@ -114,12 +114,11 @@ async def predict(payload:PredictionPayload):
     API response
         response from server on predict endpoint
     """
-    json_sample = json.loads(payload.sample)
-    sample = pd.json_normalize(json_sample)
+    sample = pd.json_normalize(payload.sample)
     predictions = pred(data=sample, backend=payload.backend, bucket=payload.bucket, model_key=payload.model_key, data_key=payload.data_key, 
                        model_path=payload.local_model_path, model_name=payload.model_name,  preprocessor_path=payload.preprocessor_path)
     log.info(f'Prediction Output: {predictions}')
     return {"msg": "Model Inference Complete", "Prediction Output": predictions} 
 
 if __name__ == "__main__":
-    uvicorn.run("server:app", host="0.0.0.0", port=8080, log_level="info")
+    uvicorn.run("server:app", host="0.0.0.0", port=5000, log_level="info")

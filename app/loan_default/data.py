@@ -28,7 +28,6 @@ patch_sklearn()
 
 s3_resource = boto3.resource('s3')
 s3 = boto3.client('s3')
- 
 
 def synthetic_datagen(bucket: str, key: str, local_path: str, backend: str = 's3', size: int = 400000):
     """Generates additional synthetic data for benchmarking and testing purposes. Not recommended in production model development.
@@ -242,4 +241,3 @@ def process_data(data: pd.DataFrame, target_path: str, bucket: str=None, key: st
             s3.upload_fileobj(file, bucket, key_path + '/preprocessor.sav')
         
         log.info('successfully saved data to s3')
-

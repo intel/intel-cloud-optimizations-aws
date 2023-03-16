@@ -1,13 +1,12 @@
----
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: eks-cluster-models
+  name: "eks-cluster-loanDefault"
   version: "1.23"
-  region: us-east-1
+  region: "us-east-1"
 
 managedNodeGroups:
-- name: eks-cluster-models-mng
+- name: "eks-cluster-loanDefault-mng"
   desiredCapacity: 3
-  instanceType: m5.large
+  instanceType: "m5.large"
