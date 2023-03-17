@@ -285,7 +285,7 @@ We encourage readers to watch for upcoming workshops and future Intel Cloud Opti
 
 Our goal with ICOMs is to help developers enhance the performance and scalability of their applications with intel software and hardware. With the increasing demand for high-performance cloud applications, it is crucial for developers to stay informed and utilize the latest technologies and tools available to them.
 
-*Most of the instructions above were sourced from this Optimization Module's associated Medium article (linked Below)*
+*The instructions above were sourced from this Optimization Module's associated Medium article (linked Below)*
 
 ### Associated Medium Article
 - [How to Build Distributed ML Applications on the AWS Cloud with Kubernetes and oneAPI](https://medium.com/intel-analytics-software/improving-human-ai-interactions-with-more-accessible-deep-learning-f3caced5d577?sk=43a615428826963cbc7fe027f6205d5c)
