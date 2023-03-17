@@ -77,8 +77,7 @@ The directory tree below outlines the codebase’s various scripts, assets, and 
 |   ├───logs/
 |   ├───server.py
 |   └───requirements.txt    
-├───assets/
-|   └───cheatsheet.png
+|
 ├───kubernetes/
 |   ├───cluster.yaml
 |   ├───deployment.yaml
