@@ -9,4 +9,4 @@ metadata:
 managedNodeGroups:
 - name: "eks-cluster-loanDefault-mng"
   desiredCapacity: 3
-  instanceType: "m5.large"
+  instanceType: "m6i.large"
