@@ -93,7 +93,7 @@ The directory tree below outlines the codebase’s various scripts, assets, and 
 
 Elastic Kubernetes Service is a fully managed service that makes it easy to deploy, manage, and scale containerized applications using Kubernetes on Amazon Web Services (AWS). It eliminates the need to install, operate, and scale Kubernetes clusters on your own infrastructure.
 
-To launch our EKS cluster, we must first create our cluster configuration file — cluster.yaml
+To launch our EKS cluster, we must first create our [cluster configuration file](https://github.com/intel/kubernetes-intel-aws-high-availability-training/blob/main/kubernetes/cluster.yaml).
   
 ```
 apiVersion: eksctl.io/v1alpha5
@@ -107,7 +107,7 @@ metadata:
 managedNodeGroups:
 - name: "eks-cluster-loanDefault-mng"
   desiredCapacity: 3
-  instanceType: "m5.large"
+  instanceType: "m6i.large"
 ```
 
 - We can configure the name and region of our cluster deployment, as well as the version of EKS that we want to run, in our “metadata” section. Most importantly, we can configure basic requirements for we compute resources in the “managedNodeGroups” section:
@@ -136,7 +136,7 @@ A Kubernetes namespace is a virtual cluster that divides and isolates resources 
 kubectl create namespace loan-default-app
 ```
 
-Now, let’s configure our Kubernetes deployment manifest. A Kubernetes deployment is a Kubernetes resource that allows you to declaratively manage a set of replica pods for a given application, ensuring that the desired number of replicas are running and available at all times while enabling features such as scaling, rolling updates, and rollbacks. It also provides an abstraction layer over the pods, allowing you to define your application’s desired state without worrying about the underlying infrastructure.
+Now, let’s configure our [Kubernetes deployment manifest](https://github.com/intel/kubernetes-intel-aws-high-availability-training/blob/main/kubernetes/deployment.yaml). A Kubernetes deployment is a Kubernetes resource that allows you to declaratively manage a set of replica pods for a given application, ensuring that the desired number of replicas are running and available at all times while enabling features such as scaling, rolling updates, and rollbacks. It also provides an abstraction layer over the pods, allowing you to define your application’s desired state without worrying about the underlying infrastructure.
   
 ```
 apiVersion: apps/v1
@@ -185,7 +185,7 @@ The Kubernetes deployment manifest (deployment.yaml) above defines the following
 
 Run `kubectl apply -f deployment.yaml` to create your Kubernetes deployment.
   
-Now let’s configure our Kubernetes service. A Kubernetes service is an abstraction layer that provides a stable IP address and DNS name for a set of pods running the same application, enabling clients to access the application without needing to know the specific IP addresses of individual pods. It also provides a way to load-balance traffic between multiple replicas of the application and can be used to define ingress rules for external access.
+Now let’s configure our [Kubernetes service](https://github.com/intel/kubernetes-intel-aws-high-availability-training/blob/main/kubernetes/service.yaml). A Kubernetes service is an abstraction layer that provides a stable IP address and DNS name for a set of pods running the same application, enabling clients to access the application without needing to know the specific IP addresses of individual pods. It also provides a way to load-balance traffic between multiple replicas of the application and can be used to define ingress rules for external access.
 
 ```
 apiVersion: v1
