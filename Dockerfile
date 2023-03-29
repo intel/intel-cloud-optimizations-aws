@@ -7,7 +7,7 @@ FROM bitnami/scikit-learn-intel:$version
 
 # copy assets over to image
 COPY /app /app
-RUN pip3 install --user --no-cache-dir -r app/requirements.txt
+RUN pip3 install --user --no-cache-dir -r requirements.txt
 ENV PATH=.local/bin:$PATH
 
 # set the working directory
@@ -16,4 +16,4 @@ WORKDIR /app
 # export port for ELB
 EXPOSE 5000
 
-ENTRYPOINT ["python", "app/server.py"]
+ENTRYPOINT ["python", "server.py"]
