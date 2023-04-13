@@ -25,7 +25,14 @@ spec:
               app: "loan-default"
      containers:
        - name: "model-image"
-         image: 
+         image: # add your image URI here
          ports:
            - containerPort: 80
          imagePullPolicy: "Always"
+         resources:
+          limits:
+            cpu: 500m
+          requests:
+           cpu: 250m
+           
+           

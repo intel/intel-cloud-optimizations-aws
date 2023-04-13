@@ -37,6 +37,7 @@ class PredictionPayload(BaseModel):
     bucket: str=None
     model_key: str=None
     data_key: str=None
+    csv_payload: str=None
     backend: str="s3"
 
 
@@ -114,7 +115,11 @@ async def predict(payload:PredictionPayload):
     API response
         response from server on predict endpoint
     """
-    sample = pd.json_normalize(payload.sample)
+    
+    if payload.csv_payload:
+        sample = pd.read_csv(payload.csv_payload)
+    else:
+        sample = pd.json_normalize(payload.sample)
     predictions = pred(data=sample, backend=payload.backend, bucket=payload.bucket, model_key=payload.model_key, data_key=payload.data_key, 
                        model_path=payload.local_model_path, model_name=payload.model_name,  preprocessor_path=payload.preprocessor_path)
     log.info(f'Prediction Output: {predictions}')
