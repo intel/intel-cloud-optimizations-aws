@@ -7,7 +7,7 @@
 This module can be used to  build and deploy AI applications on the AWS cloud. Specifically, we will focus on one of the first Intel Cloud Optimization Modules, which serves as a template with codified Intel accelerations covering various AI workloads. We will also introduce the AWS services that we will use in the process, including Amazon Elastic Kubernetes Service (EKS), Amazon Elastic Container Registry (ECR), Amazon Elastic Compute Cloud (EC2), and Elastic Load Balancer (ELB).
 
 <p align="center">
-  <img src="https://github.com/intel/kubernetes-intel-aws-high-availability-training/blob/main/images/20230328_Consolvo_CheatSheet_ICOM_Pilot_AWS_v2023.Q1.png" alt="Cheatsheet" width="1000"/>
+  <img src="https://github.com/intel/kubernetes-intel-aws-high-availability-training/blob/main/images/CheatSheet_ICOM_AWS_v2023.Q1.png" alt="Cheatsheet" width="1000"/>
 </p>
 
 
