@@ -18,13 +18,13 @@ import xgboost as xgb
 from utils.logger import log
 
 from sklearnex import patch_sklearn
+patch_sklearn()
+
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, PowerTransformer
-
-patch_sklearn()
 
 s3_resource = boto3.resource('s3')
 s3 = boto3.client('s3')
