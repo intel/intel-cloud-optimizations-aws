@@ -309,7 +309,7 @@ kubectl get hpa loan-app-pod-autoscaler -n loan-default-app --watch
 ```
 
 <p align="center">
-  <img src="https://github.com/intel/kubernetes-intel-aws-high-availability-training/blob/main/images/hpa-log.png" alt="HPA LOG" width="500"/>
+  <img src="https://github.com/intel/kubernetes-intel-aws-high-availability-training/blob/main/images/hpa-log.png" alt="HPA LOG" width="1000"/>
 </p>
 
 
