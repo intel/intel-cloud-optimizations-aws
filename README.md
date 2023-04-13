@@ -148,6 +148,8 @@ A Kubernetes namespace is a virtual cluster that divides and isolates resources 
 kubectl create namespace loan-default-app
 ```
 
+### Kubernetes Deployment
+
 Now, let’s configure our Kubernetes deployment manifest. A Kubernetes deployment is a Kubernetes resource that allows you to declaratively manage a set of replica pods for a given application, ensuring that the desired number of replicas are running and available at all times while enabling features such as scaling, rolling updates, and rollbacks. It also provides an abstraction layer over the pods, allowing you to define your application’s desired state without worrying about the underlying infrastructure.
   
 ```
@@ -203,6 +205,9 @@ The Kubernetes deployment manifest (deployment.yaml) above defines the following
 
 Run `kubectl apply -f deployment.yaml` to create your Kubernetes deployment.
 
+
+### Kubernetes Autoscaler
+
 Now we will configure the pod autoscaler kubernetes service. A Kubernetes pod autoscaler is a feature that automatically adjusts the number of running pods based on changes in resource usage and workload demand. This allows Kubernetes to scale up or down resources as needed, which helps optimize performance and minimize costs. Autoscaling is especially helpful for machine learning applications, where resource needs can vary greatly depending on the data being processed or the training model being used. By dynamically allocating resources as needed, autoscaling can ensure that machine learning applications can run efficiently and effectively, without wasting resources or incurring unnecessary costs.
 
 ```
@@ -234,6 +239,8 @@ The Kubernetes Horizontal Pod Autoscaler manifest (pod-autoscaler.yaml) above de
 - targetCPUUtilizationPercentage: 50% - threshold of CPU utilization for launching new pods
 
 Run `kubectl apply -f pod-autoscaler.yaml` to create your Pod Autoscaling service. 
+
+### Kubernetes Service
   
 Now let’s configure our Kubernetes service. A Kubernetes service is an abstraction layer that provides a stable IP address and DNS name for a set of pods running the same application, enabling clients to access the application without needing to know the specific IP addresses of individual pods. It also provides a way to load-balance traffic between multiple replicas of the application and can be used to define ingress rules for external access.
 
