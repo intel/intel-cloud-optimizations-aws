@@ -6,6 +6,11 @@
 
 This module can be used to  build and deploy AI applications on the AWS cloud. Specifically, we will focus on one of the first Intel Cloud Optimization Modules, which serves as a template with codified Intel accelerations covering various AI workloads. We will also introduce the AWS services that we will use in the process, including Amazon Elastic Kubernetes Service (EKS), Amazon Elastic Container Registry (ECR), Amazon Elastic Compute Cloud (EC2), and Elastic Load Balancer (ELB).
 
+<p align="center">
+  <img src="https://github.com/intel/kubernetes-intel-aws-high-availability-training/blob/main/images/20230328_Consolvo_CheatSheet_ICOM_Pilot_AWS_v2023.Q1.png" alt="Cheatsheet" width="1000"/>
+</p>
+
+
 ## Solution Architecture 
 
 The architecture uses Docker for application containerization and Elastic Container (ECR) Storage on AWS. The application image is then deployed on a cluster managed by Elastic Kubernetes Service (EKS). Our clusters are made up of EC2 instances. We use S3 for storing data and model objects, which are retrieved during various steps of our ML pipeline. The client interacts with our infrastructure through our Elastic Load Balancer, which gets provisioned by our Kubernetes service.
