@@ -107,14 +107,20 @@ metadata:
 
 managedNodeGroups:
 - name: "eks-cluster-loanDefault-mng"
-  desiredCapacity: 3
-  instanceType: "m5.large"
+  desiredCapacity: 2
+  minSize: 2
+  maxSize: 6
+  volumeSize: 100
+  instanceType: "m6i.xlarge"
 ```
 
 - We can configure the name and region of our cluster deployment, as well as the version of EKS that we want to run, in our “metadata” section. Most importantly, we can configure basic requirements for we compute resources in the “managedNodeGroups” section:
 
-- desiredCapacity — the number of nodes to scale to when your stack is created. In this tutorial, we will set this to 3.
-instanceType — the instance type for your nodes. This tutorial uses an m5.large instance, a 3rd Generation Xeon (2vCPU and 8GiB). Once openly available, we recommend trying out the r7iz instance family to take advantage of the Intel Advanced Matrix Extension (AMX) — a dedicated accelerator for deep learning workloads inside of Intel 4th Generation Xeon CPUs.
+- desiredCapacity - the number of nodes to scale to when your stack is created. In this tutorial, we will set this to 3.
+- minSize - the mininum number of nodes at any given time.
+- maxSize - the maximum number od nodes at any given time. 
+- volumeSize - the size of the storage volume that is provisioned per node. 
+- instanceType - the instance type for your nodes. This tutorial uses an m5.large instance, a 3rd Generation Xeon (2vCPU and 8GiB). Once openly available, we recommend trying out the r7iz instance family to take advantage of the Intel Advanced Matrix Extension (AMX) — a dedicated accelerator for deep learning workloads inside of Intel 4th Generation Xeon CPUs.
 
 We execute `eksctl create cluster -f cluster.yaml` to create the Cloud Formation stack and provision all relevant resources. With the current configurations, this process should take 10 to 15 minutes.
 
@@ -166,11 +172,16 @@ spec:
             matchLabels:
               app: "loan-default"
      containers:
-       - name: "loan-app-image"
-         image: <insert image uri>
+       - name: "model-image"
+         image: # add your image URI here
          ports:
            - containerPort: 80
          imagePullPolicy: "Always"
+         resources:
+          limits:
+            cpu: 500m
+          requests:
+           cpu: 250m
 ```
 
 The Kubernetes deployment manifest (deployment.yaml) above defines the following:
@@ -183,6 +194,7 @@ The Kubernetes deployment manifest (deployment.yaml) above defines the following
 - serviceAccountName: “loan-default-service-account” — make sure this matches the service account you created earlier.
 - topologySpreadConstraints: — helps define how pods should be distributed across your cluster. The current configuration will maintain an equal distribution of pods - across available nodes.
 - containers: name/image — where you provide the URI for your application container image and assign the image a name.
+- resources: establish the limits for CPU utilization
 
 Run `kubectl apply -f deployment.yaml` to create your Kubernetes deployment.
   
@@ -235,7 +247,7 @@ We will begin by downloading our dataset from Kaggle (https://www.kaggle.com/dat
 aws s3api create-bucket --bucket loan-default --region us-east-1
 
 # upload dataset
-aws s3api put-object --bucket --loan-default --key data/raw/credit_risk_dataset.csv --body <local path to data
+aws s3api put-object --bucket loan-default --key data/raw/credit_risk_dataset.csv --body <local path to data
 ```
 
 ### Making HTTP Requests to our API Endpoints
@@ -275,8 +287,31 @@ Now that we have a trained daal4py optimized XGBoost Classifier, we can make inf
 - backend: options include “local” or “s3” — the codebase supports running the entire app locally for debugging purposes. When using the “s3” backend, the “local_model_path” and “preprocessor_path” parameters can be set to “None”.
 
 ```
-curl -X POST <loadbalancerdns>:8080/predict -H 'Content-Type: application/json' -d ‘{"backend":"s3","model_name":"model.joblib","data_key":"data","bucket":"loan-default","model_key":"model","sample":[{"person_age":22,"person_income":59000,"person_home_ownership":"RENT","person_emp_length":123,"loan_intent":"PERSONAL","loan_grade":"D","loan_amnt":35000,"loan_int_rate":16.02,"loan_percent_income":0.59,"cb_person_default_on_file":"Y","cb_person_cred_hist_length":3},{"person_age":22,"person_income":59000,"person_home_ownership":"RENT","person_emp_length":123,"loan_intent":"PERSONAL","loan_grade":"D","loan_amnt":35000,"loan_int_rate":55.02,"loan_percent_income":0.59,"cb_person_default_on_file":"Y","cb_person_cred_hist_length":0}],"local_model_path":"None","preprocessor_path":"None"}’
+curl -X POST <loadbalancerdns>:8080/predict -H 'Content-Type: application/json' -d '{"backend":"s3","model_name":"model.joblib","data_key":"data","bucket":"loan-default","model_key":"model","sample":[{"person_age":22,"person_income":59000,"person_home_ownership":"RENT","person_emp_length":123,"loan_intent":"PERSONAL","loan_grade":"D","loan_amnt":35000,"loan_int_rate":16.02,"loan_percent_income":0.59,"cb_person_default_on_file":"Y","cb_person_cred_hist_length":3},{"person_age":22,"person_income":59000,"person_home_ownership":"RENT","person_emp_length":123,"loan_intent":"PERSONAL","loan_grade":"D","loan_amnt":35000,"loan_int_rate":55.02,"loan_percent_income":0.59,"cb_person_default_on_file":"Y","cb_person_cred_hist_length":0}],"local_model_path":"None","preprocessor_path":"None"}'
 ```
+
+## Tracking Node CPU Utilization
+If you are interested in tracking pod behavior associated with the HorizontalPodAutoscaler. You will need to follow the following steps to provision a Metrics tracking service. AWS EKS does not activate this service by default. 
+
+1. Deploy the metrics server by running
+```
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+```
+
+2. Verify that it is running 
+```
+kubectl get deployment metrics-server -n kube-system
+```
+
+3. Watch node utilization log to track CPU utilization and number of replicas. 
+```
+kubectl get hpa loan-app-pod-autoscaler -n loan-default-app --watch
+```
+
+<p align="center">
+  <img src="https://github.com/intel/kubernetes-intel-aws-high-availability-training/blob/main/images/hpa-log.png" alt="HPA LOG" width="500"/>
+</p>
+
 
 ## Summary and Discussion
 In this tutorial, we have demonstrated how to build a Kubernetes application on the AWS cloud based on a high-availability solution architecture. We have highlighted the use of Intel Xeon processors and AI Kit components to improve performance while enabling scale with Kubernetes.
@@ -289,11 +324,3 @@ Our goal with ICOMs is to help developers enhance the performance and scalabilit
 
 ### Associated Medium Article
 - [How to Build Distributed ML Applications on the AWS Cloud with Kubernetes and oneAPI](https://medium.com/intel-analytics-software/improving-human-ai-interactions-with-more-accessible-deep-learning-f3caced5d577?sk=43a615428826963cbc7fe027f6205d5c)
-
-
-  
-
-
-
-  
-
