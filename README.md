@@ -202,6 +202,38 @@ The Kubernetes deployment manifest (deployment.yaml) above defines the following
 - resources: establish the limits for CPU utilization
 
 Run `kubectl apply -f deployment.yaml` to create your Kubernetes deployment.
+
+Now we will configure the pod autoscaler kubernetes service. A Kubernetes pod autoscaler is a feature that automatically adjusts the number of running pods based on changes in resource usage and workload demand. This allows Kubernetes to scale up or down resources as needed, which helps optimize performance and minimize costs. Autoscaling is especially helpful for machine learning applications, where resource needs can vary greatly depending on the data being processed or the training model being used. By dynamically allocating resources as needed, autoscaling can ensure that machine learning applications can run efficiently and effectively, without wasting resources or incurring unnecessary costs.
+
+```
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: loan-app-pod-autoscaler
+  namespace: loan-default-app
+  labels:
+    app: "loan-default"
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: "eks-loan-default-app"
+  maxReplicas: 6
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 50 # 50% of CPU utilization
+```
+
+The Kubernetes Horizontal Pod Autoscaler manifest (pod-autoscaler.yaml) above defines the following:
+
+- kind: HorizontalPodAutoscaler — The type of Kubernetes resource
+- name: “loan-app-pod-autoscaler” — The name of our autoscaler
+- namespace: “loan-default-app” — The namespace that this deployment should be assigned to
+- app: “loan-default” — The name we assign our application
+- maxReplicas: 6 - max number of replica pods to deploy
+- minReplicas: 1 - min number of replica pods to deploy
+- targetCPUUtilizationPercentage: 50% - threshold of CPU utilization for launching new pods
+
+Run `kubectl apply -f pod-autoscaler.yaml` to create your Pod Autoscaling service. 
   
 Now let’s configure our Kubernetes service. A Kubernetes service is an abstraction layer that provides a stable IP address and DNS name for a set of pods running the same application, enabling clients to access the application without needing to know the specific IP addresses of individual pods. It also provides a way to load-balance traffic between multiple replicas of the application and can be used to define ingress rules for external access.
 
