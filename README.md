@@ -367,4 +367,4 @@ Our goal with ICOMs is to help developers enhance the performance and scalabilit
 *Most of the instructions above were sourced from this Optimization Module's associated Medium article (linked Below)*
 
 ### Associated Medium Article
-- [How to Build Distributed ML Applications on the AWS Cloud with Kubernetes and oneAPI](https://medium.com/intel-analytics-software/improving-human-ai-interactions-with-more-accessible-deep-learning-f3caced5d577?sk=43a615428826963cbc7fe027f6205d5c)
+- [How to Build Distributed ML Applications on the AWS Cloud with Kubernetes and oneAPI](https://medium.com/towards-data-science/how-to-build-distributed-ml-applications-on-the-aws-cloud-with-kubernetes-and-oneapi-81535012d136)
