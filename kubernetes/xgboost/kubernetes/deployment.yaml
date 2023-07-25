@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "eks-loan-default-app"
+  namespace: "loan-default-app"
+  labels:
+    app: "loan-default"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "loan-default"
+  template:
+    metadata:
+      labels:
+        app: "loan-default"
+    spec:
+     serviceAccountName: "loan-default-service-account"
+     topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: "loan-default"
+     containers:
+       - name: "model-image"
+         image: # add your image URI here
+         ports:
+           - containerPort: 80
+         imagePullPolicy: "Always"
+         resources:
+          limits:
+            cpu: 500m
+          requests:
+           cpu: 250m
+           
+           

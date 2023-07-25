@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+
+# ===============================================================================
+#  Copyright 2021-2022 Intel Corporation.
+# 
+#  This software and the related documents are Intel copyrighted  materials,  and
+#  your use of  them is  governed by the  express license  under which  they were
+#  provided to you (License).  Unless the License provides otherwise, you may not
+#  use, modify, copy, publish, distribute,  disclose or transmit this software or
+#  the related documents without Intel's prior written permission.
+# 
+#  This software and the related documents  are provided as  is,  with no express
+#  or implied  warranties,  other  than those  that are  expressly stated  in the
+#  License.
+# ===============================================================================
+
+#Necessary Imports
+import argparse, os
+import boto3
+import numpy as np
+import pandas as pd
+import sagemaker
+import pickle
+import xgboost as xgb
+from sklearn.model_selection import train_test_split
+
+import os
+
+if __name__ == '__main__':
+    
+    # setting paths to locations where sagemaker will inject data and expect models
+    prefix = '/opt/ml/'
+    input_path = prefix + 'input/data'
+    model_path = os.path.join(prefix, 'model')
+
+    #Passing in environment variables and hyperparameters for our training script
+    parser = argparse.ArgumentParser()
+    
+    #Can have other hyper-params such as batch-size, which we are not defining in this case
+    parser.add_argument('--objective', type=str, default="binary:logistic")
+    parser.add_argument('--max_depth', type=int, default=5)
+    parser.add_argument('--subsample', type=float, default=0.7)
+    parser.add_argument('--gamma', type=int, default=4)
+    parser.add_argument('--min_child_weight', type=int, default=6)
+    parser.add_argument('--verbosity', type=int, default=0)
+    
+    args, _ = parser.parse_known_args()
+    objective = args.objective
+    max_depth = args.max_depth
+    subsample = args.subsample
+    gamma = args.gamma
+    min_child_weight = args.min_child_weight
+    verbosity = args.verbosity
+    
+    # prepare training data
+    channel_name='train'
+    training_path = os.path.join(input_path, channel_name)
+    
+    print('Starting the training.')
+    
+    input_files = [ os.path.join(training_path, file) for file in os.listdir(training_path) ]
+    if len(input_files) == 0:
+        raise ValueError(('There are no files in {}.\n' +
+                          'This usually indicates that the channel ({}) was incorrectly specified,\n' +
+                          'the data specification in S3 was incorrectly specified or the role specified\n' +
+                          'does not have permission to access the data.').format(training_path, channel_name))
+    raw_data = [ pd.read_csv(file, header=None) for file in input_files if file.endswith(".csv")]
+    df0 = pd.concat(raw_data)
+    df1 = df0.copy()
+    y_data = df1.iloc[:, 0]
+    x_data = df1.iloc[:, 1:]
+    x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=20, random_state=42)
+
+    # training 
+    params = {'objective':objective, 'max_depth':max_depth, 'subsample':subsample, 'gamma':gamma, 'min_child_weight':min_child_weight, 'verbosity':verbosity}
+    xgb_model = xgb.XGBRegressor(**params)
+    xgb_model.fit(x_train, y_train)
+    
+    print('this is where the xgboost model is being saved: ', model_path)
+    
+    # save pickled model
+    with open(os.path.join(model_path, 'xgboost-model'), 'wb') as f:
+        pickle.dump(xgb_model, f)

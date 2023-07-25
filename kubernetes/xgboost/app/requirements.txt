@@ -1,0 +1,14 @@
+boto3
+daal4py
+fastapi
+flask
+joblib
+loguru
+numpy
+pandas
+pydantic
+scikit-learn
+scikit-learn-intelex
+uvicorn
+xgboost
+
