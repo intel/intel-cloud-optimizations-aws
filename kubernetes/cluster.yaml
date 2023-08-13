@@ -1,0 +1,15 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: "eks-cluster-loanDefault"
+  version: "1.23"
+  region: "us-east-1"
+
+managedNodeGroups:
+- name: "eks-cluster-loanDefault-mng"
+  desiredCapacity: 2
+  minSize: 2
+  maxSize: 6
+  volumeSize: 100
+  instanceType: "m6i.xlarge"
