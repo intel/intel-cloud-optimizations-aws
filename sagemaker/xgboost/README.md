@@ -11,7 +11,7 @@ SageMaker is a fully managed machine learning service on the AWS cloud. The moti
 
 ## Solution Architecture
 
-The architecture involves building and registering images to Elastic Container Register (ECR) for the xgboost-daal4py app and the lambda inference handler. The xgboost-daal4py ECR URI is provided to the sagemaker pipeline script. When the pipeline is executed, it processes data, trains/validates a model, and deploys a valid model to the inference endpoint. The lambda image is used to build a lambda function, which handles raw data pre-processing in real-time and passes processed data to the SageMaker inference endpoint. Access to the inference endpoint is managed by the API Gateway service. The training and inference compute is on a [2nd Gen Intel Xeon Platinum 8000 series processor ml.m5d.large instance](https://aws.amazon.com/ec2/instance-types/m5/).
+The architecture involves building and registering images to Elastic Container Register (ECR) for the xgboost-daal4py app and the lambda inference handler. The xgboost-daal4py ECR URI is provided to the sagemaker pipeline script. When the pipeline is executed, it processes data, trains/validates a model, and deploys a valid model to the inference endpoint. The lambda image is used to build a lambda function, which handles raw data pre-processing in real-time and passes processed data to the SageMaker inference endpoint. Access to the inference endpoint is managed by the API Gateway service. The training and inference compute is on a [2nd Generation Intel Xeon instance](https://aws.amazon.com/ec2/instance-types/m5/).
 
 ![sagemaker_diagram drawio](https://user-images.githubusercontent.com/57263404/227316402-99b9d19a-3589-4978-a3ee-41bb97336ed4.png)
 
