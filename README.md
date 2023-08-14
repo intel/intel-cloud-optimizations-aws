@@ -4,5 +4,6 @@ The Intel Cloud Optimization Modules (ICOMs) for AWS are open-source codebases w
 
 Here are the currently released modules for AWS:
 
+- **[Intel® Cloud Optimization Modules for AWS*: GPT2-Small Distributed Training](distributed-training/nlp)**: Fine-tune a Large Language Model (LLM) in a distributed setup on Intel Xeon CPUs.
 - **[Intel® Cloud Optimization Modules for AWS*: XGBoost* on Kubernetes*](kubernetes/xgboost)**: Build an accelerated Kubernetes cluster with Intel optimizations for XGBoost on an AWS computing cluster.
 - **[Intel® Cloud Optimization Modules for AWS*: XGBoost* on  SageMaker*](sagemaker/xgboost)**: Build an accelerated model development SageMaker pipeline and Lambda Inference Endpoint with Intel Optimizations for XGBoost.
