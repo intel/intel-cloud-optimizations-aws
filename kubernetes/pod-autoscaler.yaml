@@ -1,0 +1,15 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: loan-app-pod-autoscaler
+  namespace: loan-default-app
+  labels:
+    app: "loan-default"
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: "eks-loan-default-app"
+  maxReplicas: 6
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 50 # 50% of CPU utilization
