@@ -1,7 +1,7 @@
 --extra-index-url https://developer.intel.com/ipex-whl-stable-cpu
 --extra-index-url https://download.pytorch.org/whl/cpu
-torch==1.13.0+cpu
-intel_extension_for_pytorch==1.13.0
+torch==1.13.1+cpu
+intel_extension_for_pytorch==1.13.1
 accelerate==0.21.0
 aiobotocore==2.5.2
 boto3==1.26.161
