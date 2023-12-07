@@ -114,7 +114,7 @@ Clone this repo and install its dependencies:
 
 ```bash
 git clone https://github.com/intel/intel-cloud-optimizations-aws
-cd intel-cloud-optimizations-aws/distributed-training/nlp
+cd intel-cloud-optimizations-aws/distributed-training/nlp/src
 pip install -r requirements.txt
 ```
 
