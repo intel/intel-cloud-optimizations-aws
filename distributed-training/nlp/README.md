@@ -12,6 +12,10 @@ LLMs (Large Language Models) are becoming ubiquitous, but in many cases, you don
 The GPT2-Small model will be trained on the [OpenWebText](https://huggingface.co/datasets/Skylion007/openwebtext) dataset in a distributed setting, using 3rd or 4th Gen. Intel® Xeon® Scalable Processors. The project builds upon the initial codebase of [nanoGPT](https://github.com/karpathy/nanoGPT), by Andrej Karpathy.
 
 
+# Nuances of nanoGPT Implementation
+The nanoGPT implementation utilizes a custom dataloader mechanism that randomly samples the designated dataset for fine-tuning. This approach results in a higher volume of data being sampled as the number of nodes grows in the distributed system. For instance, if you have a 10GB dataset and wish to perform distributed training on half of it (5GB), the dataloader can be configured to utilize 5GB/3 of data per node. The data is sampled randomly per node and tokenized all at once, saving time by bypassing iterative tokenization during each training batch. Consequently, the implementation does not have a concept of "epochs" but rather relies on steps to pass all of the selected data through the model.
+
+
 ## Table of Contents
 1. [AWS Prerequisites](#1-aws-prerequisites): Ensure that the correct AWS and hardware prerequisites are in place.
 2. [Install Dependencies](#2-install-dependencies): Begin by installing the necessary dependencies and ensure that all required libraries and tools are setup correctly.
