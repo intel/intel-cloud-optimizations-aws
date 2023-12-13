@@ -35,12 +35,24 @@ These flags indicate that the AMX instructions are available on your system, whi
 
 ## 2. Clone the Repo and Install Dependencies
 
-install make 
+Install make 
 ```bash
 sudo apt install make
 ```
 
-Clone the repository `git clone https://github.com/intel/intel-cloud-optimizations-aws.git`, navigate to the setup folder `cd distributed-training/stable-diffusion`, and run make instructions below. We've created this instruction to make it as easy as possible to setup the environment in the master node. 
+Clone the repository 
+
+```bash
+git clone https://github.com/intel/intel-cloud-optimizations-aws.git
+``` 
+
+navigate to the setup folder 
+
+```bash
+cd distributed-training/stable-diffusion
+```
+
+and run make instructions below. We've created this instruction to make it as easy as possible to setup the environment in the master node. 
 
 ```bash
 make setup-stable-diffusion-icom-master
