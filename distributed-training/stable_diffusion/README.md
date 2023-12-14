@@ -106,7 +106,13 @@ Once we successfully test on a single node, we can begin setting up the rest of 
 
 Before creating the AMI we want to run the following in the master node: 
 
-get correct hydra Iface by running `ifconfig -a | grep enp` - this will give us the correct value to set for the **I_MPI_HYDRA_IFACE** environment variable.
+If not already installed, install net-tools
+
+```bash
+sudo apt install net-tools
+```
+
+Get correct hydra Iface by running `ifconfig -a | grep enp` - this will give us the correct value to set for the **I_MPI_HYDRA_IFACE** environment variable.
 
 Run the following to establish the required environment variables. 
 
@@ -129,74 +135,53 @@ Also delete the textual_inversion_output folder, created during our test run, by
 rm -rf textual_inversion_output
 ```
 
+**Adding SSH Access Key to Instance**: There a few different ways to accomplish this. If the following approach does not accomodate your workspace, feel free to use another method. (This is part of setting up passwordless ssh)
+1. Locate your AWS EC2 instance key. This is the key that you specified when launching the instance. It should have a ".pem" extension
+2. Open the file in a text editor
+3. Copy the output of the command, which is your key.
+4. SSH into the remote host where you want to add your key.
+5. Once logged in, navigate to the ~/.ssh directory on the remote host if it exists. If the directory does not exist, you can create it:
+```mkdir -p ~/.ssh```
+6. Within the ~/.ssh directory on the remote host, create a file named id_rsa:
+```nano ~/.ssh/id_rsa```
+7. Paste the previously copied public key into this file, making sure it's on a new line.
+8. Save the changes and exit the text editor.
+9. Adjust permissions to file `chmod 600 ~/.ssh/id_rsa`
+
+
 **Create an AMI**: Start by creating an Amazon Machine Image (AMI) from the existing instance where you have successfully run the fine-tuning on a single system. This AMI will capture the entire setup, including the dependencies, configurations, codebase, and dataset. To create an AMI, refer to [Create a Linux AMI from an instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/creating-an-ami-ebs.html#:~:text=EBS%20volumes.-,Create%20a%20Linux%20AMI%20from%20an%20instance,-You%20can%20create).
 
 
-**Security Group**: While waiting for the AMI creation, let's continue by creating a security group that enables communication among the member nodes. This security group should be configured to allow inbound and outbound traffic on the necessary ports for effective communication between the master node and the worker nodes.
+**Security Group**: While waiting for the AMI creation, let's continue by creating a security group that enables communication among the member nodes. This security group should be configured to allow inbound and outbound traffic on the necessary ports for effective communication between the master node and the worker nodes. The easiest place to do this is from the AWS console. (This is part of setting up passwordless ssh)
 
-    In the security group configuration, ensure that you have allowed *all* traffic originating from the security group itself. This setting allows seamless communication between the instances within the security group.
+In the security group configuration, ensure that you have allowed *all* traffic originating from the security group itself. This setting allows seamless communication between the instances within the security group.
 
-    By setting up the security group in this manner, you ensure that all necessary traffic can flow between the master node and the worker nodes during distributed training.
+By setting up the security group in this manner, you ensure that all necessary traffic can flow between the master node and the worker nodes during distributed training.
+
+![image](https://github.com/intel/intel-cloud-optimizations-aws/assets/57263404/f33d5d93-1822-4d4a-9bdb-8b2d67c224c2)
+
 
 ## 4. Setting up Workers Instances
+
+If you don't already have the awscli installed, follow in the instructions on this site to install it: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 
 **Launch new instances**: Use the created AMI to launch new instances, specifying the desired number of instances based on the number of systems you want to use for distributed training. This ensures that all the instances have the same environment and setup. To initiate new EC2 instances, there are two options available: using the AWS console, or AWS CLI. If you have AWS CLI configured, you can launch instances by executing the following command:
 
     ```bash
-    aws ec2 run-instances --image-id ami-xxxxxxxx --count 2 --instance-type m7i.4xlarge --key-name <MyKeyPair> --security-group-ids sg-xxxxxxxx --subnet-id subnet-xxxxxx
+    aws ec2 run-instances --image-id ami-xxxxxxxxx --count 2 --instance-type m7i.4xlarge --key-name <name of preferred ec2 key> --security-group-ids sg-xxxxxxxxx --subnet-id subnet-xxxxxxxxx
     ```
-    replacing the X's with the numbers associated to your AWS configurations, and replacing `<MyKeyPair>` with your key pair.
-
     
-4. **Passwordless SSH**: Set up passwordless SSH from the master node to all the worker nodes. To enable passwordless SSH, configure the master instance's SSH public key to be authorized on all other nodes. This will ensure SSH access without prompts between the master and worker nodes. To enable passwordless SSH, follow these steps:
+After completing the above the public key to all nodes, verify that you can connect using the key pair. Run the following from the node you have been working from (main node).
 
-    1. Generate SSH Key Pair: On the master node, run the following command to generate an SSH key pair:
+```ssh <username>@<private-ip-address>```
 
-        `ssh-keygen`
+If you can successfully log in without entering a password, it means passwordless SSH is set up correctly.
 
-        You will be prompted to enter a passphrase for the key. You can choose to enter a   passphrase or leave it blank for no passphrase. For simplicity in this guide, it is   recommended to leave it blank. The key pair will be generated and saved in the ~/.ssh     directory, with two files: ~/.ssh/id_rsa (private key) and ~/.ssh/id_rsa.pub (public    key). For security, set appropriate permissions on the private key:
+Passwordless SSH between the master node and all worker nodes ensures smooth communication and coordination during distributed training. If you encounter any difficulties, additional information can be found here.
 
-        `chmod 600 ~/.ssh/id_rsa`
+Next, to continue setting up the cluster, you will need to edit the SSH configuration file located at `~/.ssh/config` on the master node (if it doesn't exit you can create one). The configuration file should look like this:
 
-    2. Propagate the Public Key to Remote Systems: To transfer the public key to the remote hosts, use the ssh-copy-id command. If password authentication is currently enabled, this is the easiest way to copy the public key:
-
-        `bash ssh-copy-id <username>@<private-ip-address>`
-
-        This command will copy the public key to the specified remote host. You will have to    run this   command from the master node to copy the public key to all other nodes.
-
-        An alternative method is to manually copy the public key to the ~/.ssh/ authorized_keys file on the  remote host machine. Here's a step-by-step guide:
-
-        1. Open your terminal and run the following command to display your public key:
-
-            `bash cat ~/.ssh/id_rsa.pub`
-
-        2. Copy the output of the command, which is your public key.
-
-        3. SSH into the remote host where you want to add your public key.
-
-        4. Once logged in, navigate to the ~/.ssh directory on the remote host if it exists.    If the directory does not exist, you can create it:
-
-            `mkdir -p ~/.ssh`
-
-        5. Within the ~/.ssh directory on the remote host, create or edit the authorized_keys   file:
-
-        `nano ~/.ssh/authorized_keys`
-
-        6. Paste the previously copied public key into this file, making sure it's on a new     line.
-
-        7. Save the changes and exit the text editor.
-
-        Now, your public key is added to the authorized_keys file on the remote host, allowing      you to authenticate without a password when connecting via SSH.
-
-    3. Verify Passwordless SSH: After copying the public key to all nodes, verify that you can connect using the key pair:
-
-        `ssh <username>@<private-ip-address>`
-
-        If you can successfully log in without entering a password, it means passwordless SSH is set up correctly.
-
-        By following above steps, you will establish passwordless SSH between the master node and all worker nodes, ensuring smooth communication and coordination during distributed training. If you encounter any difficulties, additional information can be found here.
-
-Next, to continue setting up the cluster, you will need to edit the SSH configuration file located at `~/.ssh/config` on the master node. The configuration file should look like this:
+In the host section you will put the Private IPv4 addresses. You can get these for each node from the AWS console OR by running `hostname -i` when SSH'd into the corresponding node.
 
 ```plaintext
 Host 10.*.*.*
@@ -215,7 +200,7 @@ The `StrictHostKeyChecking no` line disables strict host key checking, allowing 
 
 With these settings, you can check your passwordless SSH by executing `ssh node1` or `ssh node2` to connect to any node without any additional prompts.
 
-Additionally, on the master node, you will create a host file (`~/hosts`) that includes the names of all the nodes you want to include in the training process, as defined in the SSH configuration above. Use `localhost` for the master node itself as you will launch the training script from the master node. The `hosts` file will look like this:
+Additionally, on the master node, you will create a host file (`~/hosts`) that includes the names of all the nodes you want to include in the training process, as defined in the SSH configuration above. Use `localhost` for the master node itself as you will launch the training script from the master node. You can stick this file in your working directory. The `hosts` file will look like this:
 
 ```plaintext
 localhost
@@ -229,7 +214,9 @@ This setup will allow you to seamlessly connect to any node in the cluster for d
 
 Now that we have this running in a single system, let's try to run it on multiple systems. To prepare for distributed training and ensure a consistent setup across all systems, follow these steps:
 
-1. **Configure Accelerate**: We need to prepare a new `accelerate` config for multi-CPU setup. But before setting up the multi-CPU environment, ensure you have the IP address of your machine handy. To obtain it, run the following command:
+1. **Configure Accelerate**: Activate your conda environment. If you did not change its name in the make file, it should be called "diffuser_icom" e.g. `conda activate diffuser_icom`
+
+We need to prepare a new "accelerate" config for multi-CPU setup. But before setting up the multi-CPU environment, ensure you have the IP address of your machine handy. To obtain it, run the following command:
 
 ```bash
 hostname -i
@@ -267,7 +254,7 @@ Please select a choice using the arrow or number keys, and selecting with enter
 Next, you can enter the number of instances you will be using. For example, here we have 3 (including the master node). 
 
 ```bash
-How many different machines will you use (use more than 1 for multi-node training)? [1]: 
+How many different machines will you use (use more than 1 for multi-node training)? [1]: 3
 ```
 
 Concerning the rank, since we are initially running this from the master node, enter `0`. For each machine, you will need to change the rank accordingly.
@@ -280,7 +267,7 @@ Please select a choice using the arrow or number keys, and selecting with enter
     2
 ```
 
-Next, you will need to provide the private IP address of the machine where you are running the `accelerate launch` command, that we found earlier with `hostname -i`.
+Next, you will need to provide the private IP address of the machine where you are running the `accelerate launch` command (main node - likely the same node you have been working on this whole time), that we found earlier with `hostname -i`.
 
 ```bash
 What is the IP address of the machine that will host the main process?   
@@ -302,7 +289,6 @@ is actually about CPU sockets. Generally, each machine will have only 1 CPU sock
 
 After completing the configuration, you will be ready to launch the multi-CPU fine-tuning process. The final output should look something like:
 
-
 ```bash
 ------------------------------------------------------------------------------------------------------------------------------------------
 In which compute environment are you running?
@@ -316,7 +302,7 @@ What is the rank of this machine?
 0
 What is the IP address of the machine that will host the main process? xxx.xxx.xxx.xxx
 What is the port you will use to communicate with the main process? 29500
-Are all the machines on the same local network? Answer `no` if nodes are on the cloud and/or on different network hosts [YES/no]: no
+Are all the machines on the same local network? Answer `no` if nodes are on the cloud and/or on different network hosts [YES/no]: nossh no
 What rendezvous backend will you use? ('static', 'c10d', ...): static
 Do you want to use Intel PyTorch Extension (IPEX) to speed up training on CPU? [yes/NO]:yes
 Do you wish to optimize your script with torch dynamo?[yes/NO]:NO
@@ -326,112 +312,15 @@ Do you wish to use FP16 or BF16 (mixed precision)?
 bf16
 ```
 
-You now should have generated a new config file named `multi_config.yaml` in the .cache folder. 
-
-2. **Create an AMI**: Start by creating an Amazon Machine Image (AMI) from the existing instance where you have successfully run the fine-tuning on a single system. This AMI will capture the entire setup, including the dependencies, configurations, codebase, and dataset. To create an AMI, refer to [Create a Linux AMI from an instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/creating-an-ami-ebs.html#:~:text=EBS%20volumes.-,Create%20a%20Linux%20AMI%20from%20an%20instance,-You%20can%20create).
-
-3. **Security Group**: While waiting for the AMI creation, let's continue by creating a security group that enables communication among the member nodes. This security group should be configured to allow inbound and outbound traffic on the necessary ports for effective communication between the master node and the worker nodes.
-
-    In the security group configuration, ensure that you have allowed *all* traffic originating from the security group itself. This setting allows seamless communication between the instances within the security group.
-
-    Please refer to the following screenshot as an example:
-
-   ![image](https://github.com/intel-innersource/frameworks.ai.infrastructure.intel-cloud-optimizations-aws/assets/57263404/f897874b-69f2-48bd-bd88-e8e3f7772fac)
-
-    By setting up the security group in this manner, you ensure that all necessary traffic can flow between the master node and the worker nodes during distributed training.
-
-5. **Launch new instances**: Use the created AMI to launch new instances, specifying the desired number of instances based on the number of systems you want to use for distributed training. This ensures that all the instances have the same environment and setup. To initiate new EC2 instances, there are two options available: using the AWS console, or AWS CLI. If you have AWS CLI configured, you can launch instances by executing the following command:
-
-    ```bash
-    aws ec2 run-instances --image-id ami-xxxxxxxx --count 2 --instance-type m6i.4xlarge --key-name <MyKeyPair> --security-group-ids sg-xxxxxxxx --subnet-id subnet-xxxxxx
-    ```
-    replacing the X's with the numbers associated to your AWS configurations, and replacing `<MyKeyPair>` with your key pair.
-    
-6. **Passwordless SSH**: Set up passwordless SSH from the master node to all the worker nodes. To enable passwordless SSH, configure the master instance's SSH public key to be authorized on all other nodes. This will ensure SSH access without prompts between the master and worker nodes. To enable passwordless SSH, follow these steps:
-
-    1. Generate SSH Key Pair: On the master node, run the following command to generate an SSH key pair:
-
-        `ssh-keygen`
-
-        You will be prompted to enter a passphrase for the key. You can choose to enter a   passphrase or leave it blank for no passphrase. For simplicity in this guide, it is   recommended to leave it blank. The key pair will be generated and saved in the ~/.ssh     directory, with two files: ~/.ssh/id_rsa (private key) and ~/.ssh/id_rsa.pub (public    key). For security, set appropriate permissions on the private key:
-
-        `chmod 600 ~/.ssh/id_rsa`
-
-    2. Propagate the Public Key to Remote Systems: To transfer the public key to the remote hosts, use the ssh-copy-id command. If password authentication is currently enabled, this is the easiest way to copy the public key:
-
-        `bash ssh-copy-id <username>@<private-ip-address>`
-
-        This command will copy the public key to the specified remote host. You will have to    run this   command from the master node to copy the public key to all other nodes.
-
-        An alternative method is to manually copy the public key to the ~/.ssh/ authorized_keys file on the  remote host machine. Here's a step-by-step guide:
-
-        1. Open your terminal and run the following command to display your public key:
-
-            `bash cat ~/.ssh/id_rsa.pub`
-
-        2. Copy the output of the command, which is your public key.
-
-        3. SSH into the remote host where you want to add your public key.
-
-        4. Once logged in, navigate to the ~/.ssh directory on the remote host if it exists.    If the directory does not exist, you can create it:
-
-            `mkdir -p ~/.ssh`
-
-        5. Within the ~/.ssh directory on the remote host, create or edit the authorized_keys   file:
-
-        `nano ~/.ssh/authorized_keys`
-
-        6. Paste the previously copied public key into this file, making sure it's on a new     line.
-
-        7. Save the changes and exit the text editor.
-
-        Now, your public key is added to the authorized_keys file on the remote host, allowing      you to authenticate without a password when connecting via SSH.
-
-    3. Verify Passwordless SSH: After copying the public key to all nodes, verify that you can connect using the key pair:
-
-        `ssh <username>@<private-ip-address>`
-
-        If you can successfully log in without entering a password, it means passwordless SSH is set up correctly.
-
-        By following above steps, you will establish passwordless SSH between the master node and all worker nodes, ensuring smooth communication and coordination during distributed training. If you encounter any difficulties, additional information can be found here.
-
-Next, to continue setting up the cluster, you will need to edit the SSH configuration file located at `~/.ssh/config` on the master node. The configuration file should look like this:
-
-```plaintext
-Host 10.*.*.*
-   StrictHostKeyChecking no
-
-Host node1
-    HostName 10.0.xxx.xxx
-    User ubuntu
-
-Host node2
-    HostName 10.0.xxx.xxx
-    User ubuntu
-```
-
-The `StrictHostKeyChecking no` line disables strict host key checking, allowing the master node to SSH into the worker nodes without prompting for verification.
-
-With these settings, you can check your passwordless SSH by executing `ssh node1` or `ssh node2` to connect to any node without any additional prompts.
-
-Additionally, on the master node, you will create a host file (`~/hosts`) that includes the names of all the nodes you want to include in the training process, as defined in the SSH configuration above. Use `localhost` for the master node itself as you will launch the training script from the master node. The `hosts` file will look like this:
-
-```plaintext
-localhost
-node1
-node2
-```
-
-This setup will allow you to seamlessly connect to any node in the cluster for distributed training.
-
-[Back to Table of Contents](#table-of-contents)
-
+You now should have generated a new config file named `multi_config.yaml` in the .cache folder. You now have 2 options:
+Option 1: Repeat the accelerate configure process on each node by sshing into the worker nodes and running `accelerate config`
+Option 2: Copy the contents of the hugging face accelerate cache to the other nodes. You would need to change the machine rank in the yaml file to correspond to the rank of each machine in the distributed system.
 
 ## 5. Fine-Tuning on Multiple CPUs
 
-Finally, it's time to run the fine-tuning process on multi-CPU setup. The following command be used to launch distributed training:
+Finally, it's time to run the fine-tuning process on multi-CPU setup. Make sure you are connected to your main machine (rank 0) and in the "./stable_diffusion/" directory. Run the following command be used to launch distributed training:
 ```bash
-mpirun -f ~/hosts -n 3 -ppn 1 accelerate launch textual_inversion_icom.py --pretrained_model_name_or_path=$MODEL_NAME --train_data_dir=$DATA_DIR --learnable_property="object"   --placeholder_token="<dicoo>" --initializer_token="toy" --resolution=512  --train_batch_size=1  --seed=7  --gradient_accumulation_steps=1 --max_train_steps=30 --learning_rate=2.0e-03 --scale_lr --lr_scheduler="constant" --lr_warmup_steps=0 --output_dir=./textual_inversion_output --mixed_precision bf16 --save_as_full_pipeline
+mpirun -f ./hosts -n 3 -ppn 1 accelerate launch textual_inversion_icom.py --pretrained_model_name_or_path="runwayml/stable-diffusion-v1-5" --train_data_dir="./dicoo/" --learnable_property="object"   --placeholder_token="<dicoo>" --initializer_token="toy" --resolution=512  --train_batch_size=1  --seed=7  --gradient_accumulation_steps=1 --max_train_steps=30 --learning_rate=2.0e-03 --scale_lr --lr_scheduler="constant" --lr_warmup_steps=3 --output_dir=./textual_inversion_output --mixed_precision bf16 --save_as_full_pipeline
 ```
 
 Some notes on the arguments for `mpirun` to consider:
@@ -454,8 +343,6 @@ Some notes on the arguments for `mpirun` to consider:
 - `--save_as_full_pipeline`: Save the complete stable diffusion pipeline.
 
 ## 6. Comments on Distributed Training and Benefits
-
-By adopting distributed training techniques, we witness a remarkable improvement in data processing efficiency. In approximately 29 minutes, we process three times the amount of data as compared to non-distributed training methods. Additionally, we get a lower loss value indicating better model generalization. This substantial speed boost and better generalization is a testament to the immense advantages of leveraging distributed training. Distributed training is of paramount importance in modern machine learning and deep learning scenarios. Its significance lies in the following aspects:
 
 - Faster Training: As demonstrated in the output, distributed training significantly reduces the training time for large datasets. It allows parallel processing across multiple nodes, which accelerates the training process and enables efficient utilization of computing resources.
 
@@ -494,7 +381,5 @@ Please be cautious when using these commands, as they will permanently delete th
 
 4. Stay connected with us on social media:
 
-- Ankur Singh | AI Solutions Engineer Intern | [LinkedIn](https://www.linkedin.com/in/ankur-singh-ml/)
-- Benjamin Consolvo | AI Community Enablement Manager | [LinkedIn](https://linkedin.com/in/bconsolvo) | [Twitter](https://twitter.com/bpconsolvo )
+-  Eduardo Alvarez | Senior AI Solutions Engineer | [LinkedIn](https://www.linkedin.com/in/eduandalv/)
 
-[Back to Table of Contents](#table-of-contents)
