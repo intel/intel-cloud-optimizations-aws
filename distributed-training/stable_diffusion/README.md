@@ -12,11 +12,11 @@ This Intel Cloud Optimization Module is focused on providing instructions for ex
 ## 1. AWS Prerequisites
 Before proceeding, ensure you have an AWS account and the necessary permissions to launch EC2 instances, create Amazon Machine Images (AMIs), create security groups, and create S3 storage buckets.
 
-We used 3x [*m7i.4xlarge* EC2 instances](https://aws.amazon.com/ec2/instance-types/m6i/) with Ubuntu 22.04 and 250 GB of storage each.
+We used three [*m7i.4xlarge* EC2 instances](https://aws.amazon.com/ec2/instance-types/m6i/) with Ubuntu 22.04 and 250 GB of storage each.
 
 In order to get started, you must first launch an EC2 instance and open it up in a command prompt. You can do so from the AWS console with the instructions that are found [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-launch-instance-wizard.html).
 
-If you are using a 4th Gen. Xeon CPU, you can verify that you have the AMX instruction set by running:
+If you are using a 4th Geneneration Xeon CPU, you can verify that you have the AMX instruction set by running:
 
 ```bash
 lscpu | grep amx
@@ -29,9 +29,6 @@ amx_bf16 amx_tile amx_int8
 ```
 
 These flags indicate that the AMX instructions are available on your system, which are essential for leveraging mixed precision training and using `bfloat16`. Please keep in mind that, for now, the AMX instruction set is only supported by 4th Gen. Xeon CPUs.
-
-[Back to Table of Contents](#table-of-contents)
-
 
 ## 2. Clone the Repo and Install Dependencies
 
@@ -49,7 +46,19 @@ git clone https://github.com/intel/intel-cloud-optimizations-aws.git
 navigate to the setup folder 
 
 ```bash
-cd distributed-training/stable-diffusion
+cd intel-cloud-optimizations-aws/distributed-training/stable_diffusion/
+```
+
+install miniconda by running
+
+```bash
+make install-miniconda
+```
+
+source bash profile to activate base conda env
+
+```bash
+source ~/.bashrc
 ```
 
 and run make instructions below. We've created this instruction to make it as easy as possible to setup the environment in the master node. 
