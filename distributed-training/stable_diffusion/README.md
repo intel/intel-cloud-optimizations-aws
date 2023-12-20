@@ -339,7 +339,7 @@ Some notes on the arguments for `mpirun` to consider:
 - `--lr_scheduler`: The scheduler type to use. Choose between ["linear", "cosine", "cosine_with_restarts", "polynomial", constant" "constant_with_warmup"]
 - `--lr_warmup_steps`: Number of steps for the warmup in the lr scheduler.
 - `--output_dir`: The output directory where the model predictions and checkpoints will be written.
-- `--mixed_precision`: Whether to use mixed precision. Choose between fp16 and bf16 (bfloat16). Bf16 requires PyTorch >= 1.10. and an Nvidia Ampere GPU.
+- `--mixed_precision`: Whether to use mixed precision.
 - `--save_as_full_pipeline`: Save the complete stable diffusion pipeline.
 
 ## 6. Comments on Distributed Training and Benefits
