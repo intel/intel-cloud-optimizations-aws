@@ -4,7 +4,7 @@ The Intel Cloud Optimization Modules (ICOMs) are open-source codebases with codi
 ### Helpful Assets:
 **[Cheatsheet](assets/AWS_Stable_Diffusion_Distributed_Training_CheatSheet.pdf)**
 **[Whitepaper](assets/AWS_Stable_Diffusion_Distributed_Training_WhitePaper.pdf)**
-**[Solution Architecture](assets/AWS_Stable_Diffusion_Distributed_Training_WhitePaper.pdf)**
+**[Solution Architecture](assets/AWS_Solution_Architecture.png)**
 
 
 ## Introduction
