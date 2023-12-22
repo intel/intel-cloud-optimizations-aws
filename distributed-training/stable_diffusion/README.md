@@ -1,6 +1,11 @@
 # Intel® Cloud Optimization Modules for AWS: Stable Diffusion Distributed Training
 The Intel Cloud Optimization Modules (ICOMs) are open-source codebases with codified Intel AI software  optimizations and instructions built specifically for each Cloud Service Provider (CSP).  The ICOMs are built with production AI developers in mind, leveraging popular AI frameworks within the context of cloud services.
 
+### Helpful Assets:
+**[Cheatsheet](assets/AWS_Stable_Diffusion_Distributed_Training_CheatSheet.pdf)**
+**[Whitepaper](assets/AWS_Stable_Diffusion_Distributed_Training_WhitePaper.pdf)**
+**[Solution Architecture](assets/AWS_Solution_Architecture.png)**
+
 
 ## Introduction
 
