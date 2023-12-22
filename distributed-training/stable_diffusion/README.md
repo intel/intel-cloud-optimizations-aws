@@ -1,6 +1,7 @@
 # Intel® Cloud Optimization Modules for AWS: Stable Diffusion Distributed Training
 The Intel Cloud Optimization Modules (ICOMs) are open-source codebases with codified Intel AI software  optimizations and instructions built specifically for each Cloud Service Provider (CSP).  The ICOMs are built with production AI developers in mind, leveraging popular AI frameworks within the context of cloud services.
 
+
 ## Introduction
 
 A Stable Diffusion Generative Text to Image Model leverages a diffusion process to convert textual descriptions into coherent image representations, establishing a robust foundation for multimodal learning tasks. Fine-tuning this model enables users to tailor its generation capabilities towards specific domains or datasets, thereby improving the quality and relevance of the produced imagery. 
@@ -8,6 +9,19 @@ A Stable Diffusion Generative Text to Image Model leverages a diffusion process 
 As the fine-tuning process can be computationally intensive, especially with burgeoning datasets, distributing the training across multiple Intel 4th Gen CPUs equipped with Advanced Matrix Extension (AMX) and BF16 mixed precision training support through Intel's extension for PyTorch can significantly accelerate the fine-tuning task.
 
 This Intel Cloud Optimization Module is focused on providing instructions for executing this fine-tuning workload on the AWS cloud using Intel 4th Generation Processors (Codednamed: Sapphire Rapids) and software optimizations offered through Hugging Face's Accelerate library. 
+
+## Solution Architecture
+This solution utilizes EC2 compute instances within a distributed system, where the Rank 0 node establishes the foundational image.
+This image is then registered as an AMI and used to construct the Rank 1 and 2 nodes. The entire workload is orchestrated through the
+Rank 0 node, a process depicted in Figure 1. However, Figure 1 does not show the integral software components that facilitate
+distributed training. These include the Hugging Face Accelerate API and the oneCCL collective operations, essential for enabling
+communication and synchronization between the nodes, ensuring consistent updates to the model's state throughout the fine-tuning
+process.
+
+<p align="center">
+  <img src="assets/AWS_Solution_Architecture.png?raw=true" alt="Architecture Diagram"/>
+</p>
+
 
 ## 1. AWS Prerequisites
 Before proceeding, ensure you have an AWS account and the necessary permissions to launch EC2 instances, create Amazon Machine Images (AMIs), create security groups, and create S3 storage buckets.
