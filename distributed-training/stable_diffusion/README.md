@@ -339,7 +339,7 @@ Option 2: Copy the contents of the hugging face accelerate cache to the other no
 
 Finally, it's time to run the fine-tuning process on multi-CPU setup. Make sure you are connected to your main machine (rank 0) and in the "./stable_diffusion/" directory. Run the following command be used to launch distributed training:
 ```bash
-mpirun -f ./hosts -n 3 -ppn 1 accelerate launch textual_inversion_icom.py --pretrained_model_name_or_path="runwayml/stable-diffusion-v1-5" --train_data_dir="./dicoo/" --learnable_property="object"   --placeholder_token="<dicoo>" --initializer_token="toy" --resolution=512  --train_batch_size=1  --seed=7  --gradient_accumulation_steps=1 --max_train_steps=30 --learning_rate=2.0e-03 --scale_lr --lr_scheduler="constant" --lr_warmup_steps=3 --output_dir=./textual_inversion_output --mixed_precision bf16 --save_as_full_pipeline
+mpirun -f ./hosts -n 3 -ppn 1 accelerate launch textual_inversion_icom.py --pretrained_model_name_or_path="runwayml/stable-diffusion-v1-5" --train_data_dir="./dicoo/" --learnable_property="object"   --placeholder_token="<dicoo>" --initializer_token="toy" --resolution=512  --train_batch_size=3  --seed=7  --gradient_accumulation_steps=1 --max_train_steps=30 --learning_rate=2.0e-03 --scale_lr --lr_scheduler="constant" --lr_warmup_steps=3 --output_dir=./textual_inversion_output --mixed_precision bf16 --save_as_full_pipeline
 ```
 
 Some notes on the arguments for `mpirun` to consider:
